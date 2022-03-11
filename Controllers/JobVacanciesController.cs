@@ -6,6 +6,7 @@
     using DevJobs.API.Persistence.Repositories;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
+    using Serilog;
 
     [Route("api/job-vacancies")]
     [ApiController]
@@ -28,6 +29,8 @@
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
+            Log.Information("Get JobVacancy by id: " + id);
+
             var jobVacancy = _repository.GetById(id);
 
             if (jobVacancy == null)
@@ -38,6 +41,22 @@
 
 
         //POST api/job-vacancies
+        /// <summary>
+        /// Cadastrar vaga de emprego
+        /// </summary>
+        /// <remarks>
+        /// {
+        /// "title": "Dev Pleno 1",
+        /// "description": "Desenvolvedor .net Pleno ",
+        /// "company": "Zup Innovation",
+        /// "isRemote": true,
+        /// "salaryRange": "7000-11000"
+        ///  }
+        ///  </remarks>
+        /// <param name="model">Dados da vaga</param>
+        /// <returns>Objeto recém-criado</returns>
+        /// <response code="201">Sucesso.</response>
+        /// <response code="400">Dados invalido.</response>
         [HttpPost]
         public IActionResult Post(AddJobVacancyInputModel model)
         {
@@ -48,11 +67,14 @@
                 model.IsRemote,
                 model.SalaryRange);
 
+            if (jobVacancy.Title.Length > 30)
+                return BadRequest("Título precisa ser menor de 30 caracteres!");
+
             _repository.Add(jobVacancy);
 
             return CreatedAtAction(
                 "GetById",
-                new {id = jobVacancy.Id },
+                new { id = jobVacancy.Id },
                 jobVacancy);
         }
 

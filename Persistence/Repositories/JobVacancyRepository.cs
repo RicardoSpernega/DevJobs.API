@@ -24,7 +24,7 @@ namespace DevJobs.API.Persistence.Repositories
 
         public List<JobVacancy> GetAll()
         {
-            return _context.JobVacancies.Include(jv => jv.Applications).ToList();
+            return _context.JobVacancies.ToList();  //.Include(jv => jv.Applications).ToList(); -- Deixa a aplicação mais pesada (caso queria saber as applications das vagas, buscar no detalhes)
         }
 
         public JobVacancy GetById(int id)
